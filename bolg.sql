@@ -54,7 +54,7 @@ CREATE TABLE IF NOT EXISTS `blog_offline`.`posts` (
   `image` VARCHAR(255) NULL DEFAULT 'posts\images\post_default.png',
   `created_by` INT NOT NULL,
   `status` ENUM('pending', 'approved', 'rejected') NULL DEFAULT 'pending',
-  `action_by` INT NOT NULL,
+  `action_by` INT  NULL,
   `created_at` TIMESTAMP NULL DEFAULT current_timestamp,
   PRIMARY KEY (`id`),
   INDEX `fk_posts_users1_idx` (`created_by` ASC) VISIBLE,

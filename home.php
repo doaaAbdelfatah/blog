@@ -1,88 +1,75 @@
-<?php
-session_start();
-if (empty($_SESSION["user"])){
-	header("location:index.php?secure=page");
-}else{
-	$user= $_SESSION["user"];
-}
-
+<?php 
+$active_link = "home";
+require("header.php")
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-	<title>Login V1</title>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-<!--===============================================================================================-->	
-	<link rel="icon" type="image/png" href="images/icons/favicon.ico"/>
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/bootstrap/css/bootstrap.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="fonts/font-awesome-4.7.0/css/font-awesome.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/animate/animate.css">
-<!--===============================================================================================-->	
-	<link rel="stylesheet" type="text/css" href="vendor/css-hamburgers/hamburgers.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="vendor/select2/select2.min.css">
-<!--===============================================================================================-->
-	<link rel="stylesheet" type="text/css" href="css/util.css">
-	<link rel="stylesheet" type="text/css" href="css/main.css">
-<!--===============================================================================================-->
-</head>
-<body  style="background: linear-gradient(-135deg, #c850c0, #4158d0);">
 	
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="#">BLOG</a>
-  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-    <span class="navbar-toggler-icon"></span>
-  </button>
 
-  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item active">
-        <a class="nav-link" href="home.php">Home <span class="sr-only">(current)</span></a>
-      </li>
-      
-      <!-- <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          Dropdown
-        </a>
-        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-          <a class="dropdown-item" href="#">Action</a>
-          <a class="dropdown-item" href="#">Another action</a>
-          <div class="dropdown-divider"></div>
-          <a class="dropdown-item" href="#">Something else here</a>
-        </div>
-      </li> -->
-     
-    </ul>
-	 <span class="mx-2"><?php echo "Welcome " . $user["name"]?></span>
-     <form class="form-inline my-2 my-lg-0" method="POST" action="logout.php">
-      <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Logout</button>
-    </form> 
+<div class="container mt-4">
+  <?php if ($user["role"] == "admin" || $user["role"] == "editor"){ ?>
+  <div>
+  <h1>Make Post</h1>
+  <form action="post_create.php" method="POST" enctype="multipart/form-data">
+      <input type="text" name="title" class="form-control m-1 mt-5" placeholder="Post Title">
+      <textarea name="body" class="form-control m-1" rows="5"  placeholder="Post Body"></textarea>
+      <input type="file" name="image" multiple class="form-control m-1">      
+      <input type="submit" class="btn btn-light m-1" value="Post">
+  </form>
   </div>
-</nav>
-	
-	
+  <?php }?>
+  <div class="m-5">
+    <?php
+      if ($user["role"] != "admin")  $status_cond ="status='approved'";
+      else $status_cond ="status in ('approved' ,'pending')";
 
-	
-<!--===============================================================================================-->	
-	<script src="vendor/jquery/jquery-3.2.1.min.js"></script>
-<!--===============================================================================================-->
-	<script src="vendor/bootstrap/js/popper.js"></script>
-	<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
-<!--===============================================================================================-->
-	<script src="vendor/select2/select2.min.js"></script>
-<!--===============================================================================================-->
-	<script src="vendor/tilt/tilt.jquery.min.js"></script>
-	<script >
-		$('.js-tilt').tilt({
-			scale: 1.1
-		})
-	</script>
-<!--===============================================================================================-->
-	<script src="js/main.js"></script>
+      $qry = "SELECT p.id, p.title, p.body, p.image, p.created_by, p.status, p.action_by, p.created_at ,u.name user_name  FROM posts p join users u  on (u.id = p.created_by) where $status_cond order by p.created_at desc";
 
-</body>
-</html>
+      require_once("config.php");
+      $cn = mysqli_connect(HOST_NAME, DB_USER_NAME, DB_PW, DB_NAME, DB_PORT);
+      $rslt = mysqli_query($cn, $qry);
+      while($post =mysqli_fetch_assoc($rslt)){
+        // var_dump($row);
+        ?>
+          <div class="row">
+            <div class="col mx-2 my-1">
+              <div class="card text-white bg-secondary">
+                <img class="card-img-top" src="<?= $post['image'] ?>" alt="">
+                <div class="card-body">                  
+                  <h4 class="card-title"><?= $post['title'] ?></h4>
+                  <p class="card-text"><?= $post['body'] ?></p>                  
+                  <div class="d-flex justify-content-between">
+                    <p class="text-danger">Post by <?= $post['user_name'] ?> at <?= $post['created_at'] ?></p>
+                    <div>
+                    <?php 
+                    
+                    if($user["role"] =="admin" && $post["status"] == "pending"){
+                      ?>
+                      <a href="post_action.php?post_id=<?= $post['id'] ?>&action=approved" class="btn btn-sm btn-success">Approve</a>
+                      <a href="post_action.php?post_id=<?= $post['id'] ?>&action=rejected" class="btn btn-sm btn-danger">Reject</a>
+                    <?php
+                    }elseif($user["id"] == $post["created_by"] || $user["role"] =="admin")
+                    {
+                    ?>
+                    <a href="post_edit.php?post_id=<?= $post['id'] ?>" class="btn btn-sm btn-success">edit</a>
+                    <a href="post_delete.php?post_id=<?= $post['id'] ?>" class="btn btn-sm btn-danger">delete</a>
+                    <?php
+                    }
+                    ?>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            </div>
+          </div>
+        <?php
+      }
+  
+      mysqli_close($cn);
+    
+    ?>
+
+  </div>
+  <div class="m-5">
+    &nbsp;
+  </div>
+</div>
+	<?php require("footer.php")?>
