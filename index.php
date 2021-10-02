@@ -1,5 +1,17 @@
+<?php
+	session_start();
+	$lang ="en";
+	if (!empty($_SESSION["lang"])){
+		$lang=$_SESSION["lang"];
+	}
+	if ($lang =="ar") require_once("messages_ar.php");
+	elseif ($lang =="fr") require_once("messages_fr.php");
+	else require_once("messages_en.php");
+?>
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?=$lang?>" dir="<?=$messages ["dir"]?>">
 <head>
 	<title>Login V1</title>
 	<meta charset="UTF-8">
@@ -21,8 +33,7 @@
 	<link rel="stylesheet" type="text/css" href="css/main.css">
 <!--===============================================================================================-->
 </head>
-<body>
-	
+<body>	
 	<div class="limiter">
 		<div class="container-login100">
 			<div class="wrap-login100">
@@ -32,11 +43,12 @@
 
 				<form class="login100-form validate-form" action="login.php" method="POST">
 					<span class="login100-form-title">
-						Member Login
+						<?=$messages ["Member Login"]?>
+					
 					</span>
 					<span class="text-danger mb-2"> 
 					<?php
-					session_start();
+				
 					if(!empty( $_SESSION["errors"]) && !empty( $_SESSION["errors"]["invalid_login"])){
 						echo $_SESSION["errors"]["invalid_login"];
 					}
@@ -47,7 +59,7 @@
 					</span>
 					
 					<div class="wrap-input100 validate-input" data-validate = "Valid email is required: ex@abc.xyz">
-						<input class="input100" type="text" name="email" placeholder="Email" value="<?php
+						<input class="input100" type="text" name="email" placeholder="<?=$messages ["Email"]?>" value="<?php
 						if(!empty($_GET['email']))  echo $_GET['email'];						
 						?>">
 						<span class="focus-input100"></span>
@@ -57,7 +69,7 @@
 					</div>
 
 					<div class="wrap-input100 validate-input" data-validate = "Password is required">
-						<input class="input100" type="password" name="pass" placeholder="Password">
+						<input class="input100" type="password" name="pass" placeholder="<?=$messages ["Password"]?>">
 						<span class="focus-input100"></span>
 						<span class="symbol-input100">
 							<i class="fa fa-lock" aria-hidden="true"></i>
@@ -66,23 +78,35 @@
 					
 					<div class="container-login100-form-btn">
 						<button class="login100-form-btn" type="submit">
-							Login
+						<?=$messages ["Login"]?>
 						</button>
 					</div>
 
 					<div class="text-center p-t-12">
 						<span class="txt1">
-							Forgot
+						<?=$messages ["Forgot"]?>
 						</span>
 						<a class="txt2" href="#">
-							Username / Password?
+						<?=$messages ["Username"]?> / <?=$messages ["Password"]?> <?=$messages ["?"]?>
+						</a>
+					</div>
+					<div class="text-center p-t-12">
+						
+						<a class="txt2" href="change_lang.php?lang=en">
+							English
+						</a>
+						| <a class="txt2" href="change_lang.php?lang=fr">
+							French
+						</a>
+						| <a class="txt2" href="change_lang.php?lang=ar">
+							اللغة العربية
 						</a>
 					</div>
 
 					<div class="text-center p-t-50">
 						<a class="txt2" href="register.php">
-							Create your Account
-							<i class="fa fa-long-arrow-right m-l-5" aria-hidden="true"></i>
+						<?=$messages ["Create your Account"]?>
+							<i class="fa fa-long-arrow-<?=$messages ["right"]?> m-l-5" aria-hidden="true"></i>
 						</a>
 					</div>
 				</form>

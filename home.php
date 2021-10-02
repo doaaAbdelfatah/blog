@@ -7,7 +7,7 @@ require("header.php")
 <div class="container mt-4">
   <?php if ($user["role"] == "admin" || $user["role"] == "editor"){ ?>
   <div>
-  <h1>Make Post</h1>
+  <h1><?=$messages["Make Post"]?></h1>
   <form action="post_create.php" method="POST" enctype="multipart/form-data">
       <input type="text" name="title" class="form-control m-1 mt-5" placeholder="Post Title">
       <textarea name="body" class="form-control m-1" rows="5"  placeholder="Post Body"></textarea>

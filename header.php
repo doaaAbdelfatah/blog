@@ -1,5 +1,15 @@
 <?php
 session_start();
+
+$lang ="en";
+if (!empty($_SESSION["lang"])){
+  $lang=$_SESSION["lang"];
+}
+
+if ($lang =="ar") require_once("messages_ar.php");
+else require_once("messages_en.php");
+
+
 if (empty($_SESSION["user"])){
 	header("location:index.php?secure=page");
 }else{
@@ -11,7 +21,7 @@ if ($active_link =="users" && $user["role"] != "admin"){
 
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?=$lang?>" dir="<?=$messages ["dir"]?>">
 <head>
 	<title>Login V1</title>
 	<meta charset="UTF-8">
@@ -78,9 +88,31 @@ if ($active_link =="users" && $user["role"] != "admin"){
         <?php }?>
      
     </ul>
-	 <span class="mx-2"><?php echo "Welcome " . $user["name"]?></span>
-     <form class="form-inline my-2 my-lg-0" method="POST" action="logout.php">
-      <button class="btn btn-outline-secondary my-2 my-sm-0" type="submit">Logout</button>
-    </form> 
+
+    <ul class="navbar-nav mr-auto">
+
+
+<li class="nav-item dropdown">
+  <a class="nav-link dropdown-toggle " href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  <?=$user["name"]?>
+  </a>
+  <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+  <?php
+  if ($lang =="ar"){
+      ?>
+      <a class="dropdown-item" href="change_lang.php?lang=en">English</a>
+      <?php
+  }else{
+    ?>
+    <a class="dropdown-item" href="change_lang.php?lang=ar">اللغةالعربية</a>
+    <?php
+  }
+  ?>  
+
+    <a class="dropdown-item" href="logout.php">Logout</a>
+  </div>
+</li>
+</ul>
+
   </div>
 </nav>
