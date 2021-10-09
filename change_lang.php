@@ -1,6 +1,6 @@
 <?php
 
-    var_dump($_SERVER);
+    // var_dump($_SERVER);
     session_start();
     if (!empty($_REQUEST["lang"])){
         if ($_REQUEST["lang"] =="ar") $_SESSION["lang"]="ar";
